@@ -110,10 +110,10 @@
 <body>
   <div class="spinner"></div>
   <img src="" alt="background" class="background">
-  <canvas id="output" width="640" height="480"></canvas>
+  <canvas id="output" width="1280" height="960"></canvas>
   <div class="preview">
     <button id="toggleButton" onclick="toggleWebcam()">Hide Webcam</button>
-    <video id="webcam" autoplay playsinline width="640" height="480"></video>
+    <video id="webcam" autoplay playsinline width="1280" height="960"></video>
   </div>
 
   <script>
@@ -125,10 +125,15 @@
     let net;
 
     async function setupCamera() {
-      video.width = 640;
-      video.height = 480;
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: true
+        video: {
+          width: {
+            ideal: 1280
+          },
+          height: {
+            ideal: 960
+          }
+        }
       });
       video.srcObject = stream;
       return new Promise((resolve) => {
@@ -142,7 +147,8 @@
       net = await bodyPix.load({
         architecture: 'MobileNetV1',
         outputStride: 16,
-        multiplier: 0.75
+        multiplier: 0.75,
+        internalResolution: 'full'
       });
     }
 
@@ -156,7 +162,6 @@
           imageData.data[i + 3] = 0;
         }
       }
-
       ctx.putImageData(imageData, 0, 0);
       requestAnimationFrame(draw);
     }
