@@ -179,11 +179,8 @@
     const backgrounds = ['background1.png', 'background2.png', 'background3.png'];
     let i = 0;
 
-    background.src = backgrounds[i];
-    setInterval(function () {
-      i = (i + 1) % backgrounds.length;
-      background.src = backgrounds[i];
-    }, 5000);
+    background.src = backgrounds[0];
+
 
     main();
 
