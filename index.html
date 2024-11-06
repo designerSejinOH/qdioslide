@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-time Background Removal</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
+  <style>
+    /* HTML 배경 이미지 */
+    body {
+      margin: 0 auto;
+    }
+
+    /* 스피너 스타일 */
+    .spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 0, 0, 0.3);
+      border-top: 4px solid #000;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* 화면 전체를 꽉 채우는 canvas */
+    #output {
+      display: none;
+      /* 초기에는 숨김 처리 */
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      /* 비율 유지하며 너비 맞춤 */
+      z-index: 1;
+    }
+
+    /* 오른쪽 하단에 작게 표시되는 웹캠 화면 */
+    .preview {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      width: fit-content;
+      height: fit-content;
+    }
+
+    #webcam {
+      width: 160px;
+      height: 120px;
+      border-radius: 15px;
+    }
+
+    /* 배경 이미지 */
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    /* 숨기기/보이기 버튼 스타일 */
+    #toggleButton {
+      width: 160px;
+      height: fit-content;
+      padding: 10px;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+
+    #toggleButton:hover {
+      background-color: #333;
+    }
+
+    #toggleButton:active {
+      background-color: #333;
+
+    }
+  </style>
+</head>
+
+<body>
+  <div class="spinner"></div>
+  <img src="" alt="background" class="background">
+  <canvas id="output" width="640" height="480"></canvas>
+  <div class="preview">
+    <button id="toggleButton" onclick="toggleWebcam()">Hide Webcam</button>
+    <video id="webcam" autoplay playsinline width="640" height="480"></video>
+  </div>
+
+  <script>
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('output');
+    const loading = document.getElementsByClassName('spinner')[0];
+    const toggleButton = document.getElementById('toggleButton');
+    const ctx = canvas.getContext('2d');
+    let net;
+
+    async function setupCamera() {
+      video.width = 640;
+      video.height = 480;
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true
+      });
+      video.srcObject = stream;
+      return new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+          resolve(video);
+        };
+      });
+    }
+
+    async function loadModel() {
+      net = await bodyPix.load({
+        architecture: 'MobileNetV1',
+        outputStride: 16,
+        multiplier: 0.75
+      });
+    }
+
+    async function draw() {
+      const segmentation = await net.segmentPerson(video);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        if (segmentation.data[i / 4] === 0) {
+          imageData.data[i + 3] = 0;
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      requestAnimationFrame(draw);
+    }
+
+    async function main() {
+      await setupCamera();
+      await loadModel();
+      loading.style.display = 'none';
+      canvas.style.display = 'block';
+      draw();
+    }
+
+    // Background image change
+    const background = document.querySelector('.background');
+    const backgrounds = ['background1.png', 'background2.png', 'background3.png'];
+    let i = 0;
+
+    background.src = backgrounds[i];
+    setInterval(function () {
+      i = (i + 1) % backgrounds.length;
+      background.src = backgrounds[i];
+    }, 5000);
+
+    main();
+
+    // Toggle webcam visibility
+    function toggleWebcam() {
+      if (video.style.display === 'none') {
+        video.style.display = 'block';
+        toggleButton.textContent = 'Hide Webcam';
+      } else {
+        video.style.display = 'none';
+        toggleButton.textContent = 'Show Webcam';
+      }
+    }
+  </script>
+</body>
+
+</html>
