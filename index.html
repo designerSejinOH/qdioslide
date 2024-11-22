@@ -7,6 +7,7 @@
   <title>Real-time Background Removal</title>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* HTML 배경 이미지 */
     body {
@@ -44,8 +45,9 @@
       /* 초기에는 숨김 처리 */
       position: absolute;
       bottom: 0px;
-      left: 0px;
-      width: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
       height: auto;
       object-fit: contain;
       /* 비율 유지하며 너비 맞춤 */
@@ -71,6 +73,7 @@
       width: 160px;
       height: 120px;
       border-radius: 15px;
+
     }
 
     /* 배경 이미지 */
@@ -104,10 +107,46 @@
       background-color: #333;
 
     }
+
+    .bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 10px;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      height: fit-content;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      background-color: #000;
+      border-radius: 60px;
+    }
   </style>
+
 </head>
 
 <body>
+  <div class="fixed z-10 top-0 left-0 flex w-full p-6">
+    <div class="bg-black rounded-full w-full h-[88px] p-6 flex justify-start items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="112" height="44" viewBox="0 0 112 44" fill="none">
+        <path
+          d="M94.2184 9.46499C91.3798 9.46768 88.706 10.1736 86.3613 11.4173V4.61003C86.3613 3.71832 85.6378 2.99485 84.7461 2.99485H79.0257C78.1333 2.99485 77.4105 3.71832 77.4105 4.61003V10.243C77.4105 11.3655 76.5006 12.2754 75.378 12.2754H72.2803C71.6369 12.2754 71.0837 12.7297 70.9592 13.3609L67.1326 32.7539C67.1326 32.7539 67.1319 32.7579 67.1312 32.7592C67.0868 32.9719 66.8916 33.1287 66.6628 33.1146C66.4232 33.0991 66.2435 32.8871 66.2435 32.6475V26.2992C66.2435 26.2992 66.2435 26.2931 66.2435 26.2898C66.2435 26.2864 66.2435 26.2837 66.2435 26.2804V1.90595C66.2435 1.01424 65.5201 0.290771 64.6284 0.290771H59.1098C58.2181 0.290771 57.4946 1.01424 57.4946 1.90595V11.527C55.0975 10.2127 52.3456 9.46499 49.4188 9.46499C42.0549 9.46499 35.7967 14.1968 33.516 20.7854C31.2359 14.1968 24.9777 9.46499 17.6132 9.46499C8.32186 9.46499 0.789062 16.9978 0.789062 26.2898C0.789062 35.5818 8.32186 43.1146 17.6138 43.1146C17.6919 43.1146 17.7693 43.1125 17.8467 43.1119L17.844 43.1146H36.8392C37.4281 43.1146 37.7242 42.4025 37.3083 41.9853L31.3523 36.0037C32.2602 34.7217 32.993 33.3077 33.5166 31.7955C35.7974 38.3834 42.0549 43.1146 49.4188 43.1146C52.3463 43.1146 55.0988 42.3662 57.4967 41.0512C57.5438 42.1986 58.4887 43.1146 59.6482 43.1146H71.3724C72.9149 43.1146 74.2427 42.0236 74.5415 40.5094L77.4138 25.9526C77.4118 26.0643 77.4105 26.1767 77.4105 26.2898C77.4105 35.5818 84.9433 43.1146 94.2353 43.1146C103.527 43.1146 111.06 35.5818 111.06 26.2898C111.06 17.0139 103.494 9.45557 94.2184 9.46499ZM24.9804 29.6049L23.1519 27.7683C22.059 26.6707 20.2823 26.6687 19.1873 27.7643C18.0971 28.8545 18.093 30.6205 19.1779 31.7154L21.0461 33.6018C20.0043 34.0918 18.8414 34.3657 17.6145 34.3657C13.1546 34.3657 9.53862 30.7497 9.53862 26.2898C9.53862 21.8299 13.1546 18.2139 17.6145 18.2139C22.0744 18.2139 25.6904 21.8299 25.6904 26.2898C25.6904 27.4709 25.4367 28.5934 24.9811 29.6049H24.9804ZM57.4946 26.2992C57.4899 30.7551 53.876 34.3657 49.4188 34.3657C44.9615 34.3657 41.3429 30.7497 41.3429 26.2898C41.3429 21.8299 44.9588 18.2139 49.4188 18.2139C53.8787 18.2139 57.4899 21.8245 57.4946 26.2804V26.2985V26.2992ZM82.6699 14.1477C82.6612 14.1564 82.3314 14.4848 82.3226 14.4929C80.7983 15.9345 79.525 18.2792 78.5317 20.4536C78.4832 20.5599 78.3204 20.5061 78.3466 20.3924L79.737 14.9849C80.0735 13.6779 80.6193 13.2593 81.6348 13.1032C81.6968 13.0938 81.7593 13.0897 81.8219 13.0897H82.1302C82.1907 13.0897 82.2513 13.0938 82.3105 13.1065C82.6464 13.1759 82.8563 13.4054 82.853 13.7169C82.8516 13.8845 82.7823 14.0366 82.6706 14.1477H82.6699ZM94.2353 34.3657C89.7747 34.3657 86.1594 30.7504 86.1594 26.2898C86.1594 21.8292 89.7747 18.2139 94.2353 18.2139C98.6959 18.2139 102.311 21.8299 102.311 26.2898C102.311 30.7497 98.6952 34.3657 94.2353 34.3657Z"
+          fill="#BEF264" />
+      </svg>
+      <div
+        class="text-lime-300 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-normal font-['Inter']">
+        슬라이드를 넘겨 여러 상황을 만들어보세요</div>
+    </div>
+  </div>
   <div class="spinner"></div>
   <img src="" alt="background" class="background">
   <canvas id="output" width="1280" height="960"></canvas>
@@ -115,6 +154,30 @@
     <button id="toggleButton" onclick="toggleWebcam()">Hide Webcam</button>
     <video id="webcam" autoplay playsinline width="1280" height="960"></video>
   </div>
+
+  <button
+    class="fixed rounded-full w-fit p-6 aspect-square bg-black flex justify-center items-center z-10 left-6 top-1/2 -translate-y-1/2 active:bg-white transition-all duration-300"
+    id="prevButton">
+    <svg xmlns="http://www.w3.org/2000/svg" width="72" height="73" viewBox="0 0 72 73" fill="none">
+      <path
+        d="M25.2409 32.128L47.7269 54.614C48.1955 55.0826 48.1955 55.8424 47.7269 56.3111L45.1813 58.8567C44.7127 59.3253 43.9529 59.3253 43.4843 58.8567L21.8468 37.2192C21.3782 36.7506 21.3782 35.9908 21.8468 35.5221L25.2409 32.128Z"
+        fill="#BEF264" />
+      <path
+        d="M25.2409 40.6131L47.7269 18.1271C48.1955 17.6585 48.1955 16.8987 47.7269 16.4301L45.1813 13.8845C44.7127 13.4159 43.9529 13.4159 43.4843 13.8845L21.8468 35.5221C21.3782 35.9908 21.3782 36.7506 21.8468 37.2192L25.2409 40.6131Z"
+        fill="#BEF264" />
+    </svg>
+  </button>
+  <button class="fixed rounded-full w-fit p-6 aspect-square bg-black flex justify-center items-center z-10 right-6 top-1/2
+    -translate-y-1/2 active:bg-white transition-all duration-300" id="nextButton"><svg
+      xmlns="http://www.w3.org/2000/svg" width="72" height="73" viewBox="0 0 72 73" fill="none">
+      <path
+        d="M46.7587 40.6129L24.2727 18.1269C23.8041 17.6583 23.8041 16.8985 24.2727 16.4299L26.8183 13.8843C27.287 13.4157 28.0467 13.4157 28.5154 13.8843L50.1528 35.5218C50.6215 35.9904 50.6215 36.7502 50.1528 37.2188L46.7587 40.6129Z"
+        fill="#BEF264" />
+      <path
+        d="M46.7587 32.1278L24.2727 54.6138C23.8041 55.0825 23.8041 55.8423 24.2727 56.3109L26.8183 58.8565C27.2869 59.3251 28.0467 59.3251 28.5154 58.8565L50.1528 37.2188C50.6215 36.7502 50.6215 35.9904 50.1528 35.5218L46.7587 32.1278Z"
+        fill="#BEF264" />
+    </svg></button>
+
 
   <script>
     const video = document.getElementById('webcam');
@@ -176,13 +239,36 @@
 
     // Background image change
     const background = document.querySelector('.background');
-    const backgrounds = ['background1.png', 'background2.png', 'background3.png'];
-    let i = 0;
+    const backgrounds = [
+      'background1.png',
+      'background2.png',
+      'background3.png',
+      'background4.png',
+      'background5.png',
+      'background6.png',
+      'background7.png',
+      'background8.png',
+      'background9.png',
+    ]
+    let currentIndex = 0;
 
-    background.src = backgrounds[0];
+    function updateBackground() {
+      background.src = backgrounds[currentIndex];
+    }
 
+    document.getElementById('prevButton').addEventListener('click', () => {
+      currentIndex = (currentIndex - 1 + backgrounds.length) % backgrounds.length;
+      updateBackground();
+    });
 
+    document.getElementById('nextButton').addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % backgrounds.length;
+      updateBackground();
+    });
+
+    updateBackground();
     main();
+
 
     // Toggle webcam visibility
     function toggleWebcam() {
